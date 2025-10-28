@@ -18,6 +18,9 @@ class CustomUNet(nn.Module):
         self.layer_connector = LAYER_CONNECTOR
         
     def build_block(self, params):
+        """
+        Build a simple block based on the specified type and parameters.
+        """
         block = BLOCKS[self.layer_block['type']]
         return block(**params)
     
@@ -25,6 +28,7 @@ class CustomUNet(nn.Module):
         layer = []
         for _ in range(block_num):
             layer.append(self.build_block(block_params))
+        
     
     def build_connector(self, params):
         connector = CONNECTOR[self.layer_connector['type']]
