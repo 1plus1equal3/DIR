@@ -1,0 +1,8 @@
+*.ipynb
+*wandb.txt
+__pycache__/
+*weights
+*.pth
+*.pt
+*.pyc
+.DS_Store
