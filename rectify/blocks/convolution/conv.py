@@ -8,8 +8,6 @@ class ConvBlock(BaseConvBlock):
         super(ConvBlock, self).__init__()
         bias = (normalization != 'bn')
         self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias)
-        self.normalization = normalization
-        
         if normalization not in self.norm_dict.keys():
             raise ValueError(f"Unsupported normalization type: {normalization}")
         else:
