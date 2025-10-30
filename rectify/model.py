@@ -113,4 +113,9 @@ class CustomModel(nn.Module):
             x = layer(x)
         return x
 
-
+# Test build model
+if __name__ == "__main__":
+    from config import sample_config
+    model_config = sample_config['model']
+    model = CustomModel(model_config)
+    print(model)

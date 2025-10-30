@@ -9,6 +9,10 @@ sample_config = {
                 "in_channels": [3, 64, 128, 256],
                 "out_channels": [64, 128, 256, 512],
                 "kernel_size": 3,
+                "stride": 1,
+                "padding": 0,
+                "use_norm": True,
+                "use_act": True
             }
         },
         "block_num": [2, 3, 3, 4],  # Number of blocks in each layer
