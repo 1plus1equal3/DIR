@@ -10,7 +10,7 @@ sample_config = {
                 "out_channels": [64, 128, 256, 512],
                 "kernel_size": 3,
                 "stride": 1,
-                "padding": 0,
+                "padding": 1,
                 "use_norm": True,
                 "use_act": True
             }

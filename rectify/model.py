@@ -115,7 +115,15 @@ class CustomModel(nn.Module):
 
 # Test build model
 if __name__ == "__main__":
+    # Test build model
     from config import sample_config
     model_config = sample_config['model']
     model = CustomModel(model_config)
     print(model)
+
+    # Test forward pass
+    import torch
+
+    input_tensor = torch.randn(1, 3, 128, 128)  # Example input tensor
+    output_tensor = model(input_tensor)
+    print(f"Output tensor shape: {output_tensor.shape}")
