@@ -1,6 +1,6 @@
 from .convolution import *
 
 BLOCKS = {
-    'conv': ConvBlock,
+    'conv': SimpleConvBlock,
     'res_conv': ResidualConvBlock,
 }
