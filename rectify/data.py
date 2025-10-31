@@ -148,12 +148,48 @@ class TrainDataset(Dataset):
             warp_image = self.transform(warp_image)
 
         return scan_image, warp_image
+    
+class ValDataset(Dataset):
+    def __init__(self, root_dir, chosen_data=['inv3d'], transform=None):
+        self.root_dir = root_dir
+        self.transform = transform
+        self.scan_images = []
+        self.warp_images = []
+
+        if 'inv3d' in chosen_data:
+            inv3d_dataset = Inv3DDataset(root_dir, training=False, transform=transform)
+            self.scan_images += inv3d_dataset.scan_images
+            self.warp_images += inv3d_dataset.warp_images
+    
+    def __len__(self):
+        return len(self.scan_images)
+
+    def __getitem__(self, idx):
+        scan_image_path = self.scan_images[idx]
+        warp_image_path = self.warp_images[idx]
+        
+        scan_image = Image.open(scan_image_path).convert("RGB")
+        warp_image = Image.open(warp_image_path).convert("RGB")
+        
+        if self.transform:
+            scan_image = self.transform(scan_image)
+            warp_image = self.transform(warp_image)
+        
+        return scan_image, warp_image
 
 # Example usage
 if __name__ == "__main__":
+
     transform = T.Compose([
         T.Resize((256, 256)),
         T.ToTensor(),
     ])
-    dataset = TrainDataset("/path/to/dataset", transform=transform)
-    dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
+    
+    train_data = ['inv3d', 'docwarp']
+    test_data = ['inv3d']
+    
+    train_dataset = TrainDataset("/path/to/dataset", chosen_data=train_data, transform=transform)
+    train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
+    
+    val_dataset = ValDataset("/path/to/dataset", chosen_data=test_data, transform=transform)
+    val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False)
