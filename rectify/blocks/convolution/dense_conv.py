@@ -1,27 +1,24 @@
-import torch 
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from .dense_layer import DenseLayer 
-class DenseBlock(nn.Module): 
-    def __init__(self, nb_layers, in_channels, growth_rate):
+from .conv_factory import ConvFactory
+
+
+class DenseBlock(nn.Module):
+    def __init__(self, in_channels, growth_rate, layers_in_block, drop_rate=0.2):
         super(DenseBlock, self).__init__()
-        
         self.layers = nn.ModuleList()
+        num_channels = in_channels
+        for _ in range(layers_in_block):
+            self.layers.append(ConvFactory(num_channels, growth_rate, drop_rate))
+            num_channels += growth_rate
 
-        for i in range(nb_layers):
-            layer_in_channels = in_channels + i * growth_rate
-            layer = DenseLayer(
-                layer_in_channels,
-                growth_rate
-            )
-            self.layers.append(layer)
-
+        self.out_channels = num_channels  
     def forward(self, x):
-        features = [x]
-        
+        features = [x] 
         for layer in self.layers:
-            concatenated_features = torch.cat(features, 1)
-            new_features = layer(concatenated_features)
-            features.append(new_features)
-            
-        return torch.cat(features, 1)
+            new_feat = layer(torch.cat(features, dim=1))
+            features.append(new_feat)
+        out = torch.cat(features, dim=1)
+        return out
+
