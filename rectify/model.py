@@ -116,8 +116,7 @@ class CustomModel(nn.Module):
 # Test build model
 if __name__ == "__main__":
     # Test build model
-    from config import sample_config
-    model_config = sample_config['model']
+    from config.simple import model as model_config
     model = CustomModel(model_config)
     print(model)
 

@@ -1,10 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from base import BaseConvBlock
 
 class ChannelSELayer(nn.Module):
-
     def __init__(self, num_channels, reduction_ratio=2):
         super(ChannelSELayer, self).__init__()
         self.num_channels = num_channels // reduction_ratio
@@ -24,7 +22,6 @@ class ChannelSELayer(nn.Module):
         return x * scale
     
 class SpatialSELayer(nn.Module):
-
     def __init__(self, num_channels):
         super(SpatialSELayer, self).__init__()
         self.conv = nn.Conv2d(num_channels, 1, kernel_size=1)
@@ -45,7 +42,6 @@ class SpatialSELayer(nn.Module):
         return output
 
 class ChannelSpatialSELayer(nn.Module):
-
     def __init__(self, num_channels, reduction_ratio=2):
         super(ChannelSpatialSELayer, self).__init__()
         self.cSE = ChannelSELayer(num_channels, reduction_ratio)
