@@ -1,7 +1,7 @@
 import torch.nn as nn
 from copy import deepcopy
-from blocks import BLOCKS
-from connector import CONNECTOR
+from .blocks import BLOCKS
+from .connector import CONNECTOR
 
 class CustomModel(nn.Module):
     """ 

@@ -1,4 +1,5 @@
 from .convolution import *
+from .vmamba import VMambaBlock
 
 BLOCKS = {
     'conv': SimpleConvBlock,
@@ -11,4 +12,5 @@ BLOCKS = {
     'channel_se': ChannelSELayer,
     'spatial_se': SpatialSELayer,
     'channel_spatial_se': ChannelSpatialSELayer,
+    'vmamba': VMambaBlock,
 }
