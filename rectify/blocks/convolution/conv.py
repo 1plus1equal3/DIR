@@ -25,19 +25,19 @@ class ConvBlock(BaseConvBlock):
         return x
     
 class SimpleConvBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, bias=True, use_norm=True, use_act=True):
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, use_norm=True, use_act=True):
         super(SimpleConvBlock, self).__init__()
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, bias=bias)
+        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size, stride, padding, dilation=dilation, groups=groups, bias=bias)
+        self.use_norm = use_norm
+        self.use_act = use_act
         if use_norm:
-            self.use_norm = use_norm
             self.norm = nn.BatchNorm2d(out_channels)
         if use_act:
-            self.use_act = use_act
             self.act = nn.ReLU(inplace=True)
 
     def forward(self, x):
         x = self.conv(x)
-        if self.use_norm is not None:
+        if self.use_norm:
             x = self.norm(x)
         if self.use_act:
             x = self.act(x)
