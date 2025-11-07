@@ -15,6 +15,7 @@ class MambaConfig:
     dt_rank: Union[int, str] = "auto" # rank of Δ
     d_conv: int = 4 # kernel size of convolution
     bias: bool = False # use bias in linear layers
+    use_pscan: bool = True # use pscan for parallel computational
 
     def __post_init__(self):
         self.d_inner = self.d_model * self.expand # inner dim
@@ -79,9 +80,10 @@ class MambaBlock(nn.Module):
         x_dbl = self.x_proj(x)  # (b, l, dt_rank + 2*n)
         (delta, B, C) = x_dbl.split(split_size=[self.args.dt_rank, n, n], dim=-1)  # delta: (b, l, dt_rank). B, C: (b, l, n)
         delta = F.softplus(self.dt_proj(delta))  # (b, l, d_in)
-
-        y = self.selective_scan(x, delta, A, B, C, D)  # (b, l, d_in)
-
+        if self.cfg.use_pscan:
+            y = self.pscan_selective_scan(x, delta, A, B, C, D)  # (b, l, d_in)
+        else:
+            y = self.selective_scan(x, delta, A, B, C, D)  # (b, l, d_in)
         return y
     
     def selective_scan(self, u, delta, A, B, C, D): # Slow implementation
