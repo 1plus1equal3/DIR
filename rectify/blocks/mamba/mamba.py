@@ -63,7 +63,7 @@ class MambaBlock(nn.Module):
         x = F.silu(x)
         y = self.ssm(x) # (b, l, d_in)
 
-        y = y + F.silu(res) # (b, l, d_in)
+        y = y * F.silu(res) # (b, l, d_in)
 
         return self.out_proj(y) # (b, l, d_model)
 
