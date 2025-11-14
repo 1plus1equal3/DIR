@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from ..convolution import ConvLayer1D, SimpleConvBlock
-from ..mlp import FullyConnectedFFN_v2
+from ..mlp import FullyConnectedFFN_v2, VMoEBlock
 
 class LayerNorm2D(nn.Module):
     """LayerNorm for channels of 2D tensor(B C H W)"""
@@ -93,7 +93,7 @@ class HSMSSD(nn.Module):
         return y, h
 
 class EfficientVIMBlock(nn.Module):
-    def __init__(self, dim, mlp_ratio=4, ssd_expand=1, state_dim=64, ffn_type='mlp'):
+    def __init__(self, dim, mlp_ratio=4, ssd_expand=1, state_dim=64, ffn_type='mlp', ffn_config=None):
         super(EfficientVIMBlock, self).__init__()
         self.dim = dim
         self.mlp_ratio = mlp_ratio
@@ -106,6 +106,8 @@ class EfficientVIMBlock(nn.Module):
 
         if ffn_type == 'mlp':
             self.ffn = FullyConnectedFFN_v2(dim, int(dim * mlp_ratio), dim)
+        elif ffn_type == 'vmoe':
+            self.ffn = VMoEBlock(input_dim=dim, output_dim=dim, **ffn_config)
         elif ffn_type is None:
             self.ffn = nn.Identity()
         else:
@@ -125,13 +127,19 @@ class EfficientVIMBlock(nn.Module):
 
         x = (1 - alpha[2]) * x + alpha[2] * self.dw_conv_2(x)
 
-        x = (1 - alpha[3]) * x + alpha[3] * self.ffn(x)
+        x_ffn = self.ffn(x)
 
-        return x
-    
+        if isinstance(x_ffn, tuple):
+            x_ffn, aux_loss = x_ffn
+            x = (1 - alpha[3]) * x + alpha[3] * x_ffn
+            return x, aux_loss
+        else:
+            x = (1 - alpha[3]) * x + alpha[3] * x_ffn
+            return x
+
 # Example usage
 if __name__ == "__main__":
-    layer = EfficientVIMBlock(dim=64, mlp_ratio=4.0, ssd_expand=1, state_dim=64, ffn_type='mlp')
+    layer = EfficientVIMBlock(dim=64, mlp_ratio=4.0, ssd_expand=1, state_dim=64, ffn_type='vmoe', ffn_config={'num_experts':4, 'top_k':2, 'capacity_factor':1.0, 'expert_dim':256, 'return_shape':'2d'})
     sample_input = torch.randn(1, 64, 32, 32)
-    output = layer(sample_input)
+    output, aux_loss = layer(sample_input)
     print(output.shape)
