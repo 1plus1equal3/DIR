@@ -1,5 +1,5 @@
 from .convolution import *
-
+from .mamba.mambair_block import MambaIR_Block
 BLOCKS = {
     'conv': SimpleConvBlock,
     'res_conv': ResidualConvBlock,
@@ -11,4 +11,5 @@ BLOCKS = {
     'channel_se': ChannelSELayer,
     'spatial_se': SpatialSELayer,
     'channel_spatial_se': ChannelSpatialSELayer,
+    'mamba_ir': MambaIR_Block,
 }
