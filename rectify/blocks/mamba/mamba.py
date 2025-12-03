@@ -18,7 +18,7 @@ class MambaConfig:
     use_pscan: bool = True # use pscan for parallel computational
 
     def __post_init__(self):
-        self.d_inner = self.d_model * self.expand # inner dim
+        self.d_inner = int(self.d_model * self.expand) # inner dim
         if self.dt_rank == "auto":
             self.dt_rank = math.ceil(self.d_model / 16)
 
